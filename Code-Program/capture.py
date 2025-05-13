@@ -1,39 +1,42 @@
+#part of main code (but not main)
+#to pull the screen out 
+# capture.py
 import pygetwindow as gw
 import mss
 import numpy as np
 import cv2
+import difflib
 
-def find_game_window(target="KovaaK"):
-    """Find visible game window with fuzzy name matching"""
-    windows = [w for w in gw.getAllWindows() if target.lower() in w.title.lower() and w.visible]
+def select_game_window():
+    """List visible windows and prompt user to type part of the title."""
+    windows = [w for w in gw.getAllWindows() if w.visible]
     if not windows:
-        raise RuntimeError(f"No visible window containing '{target}' found!")
-    return windows[0]
+        raise RuntimeError("No visible windows found!")
+
+    titles = [w.title for w in windows]
+    print("Available windows:")
+    for t in titles:
+        print(f" - {t}")
+
+    target = input("\nType part of the window title to select: ")
+    matches = difflib.get_close_matches(target, titles, n=1, cutoff=0)
+    if not matches:
+        raise RuntimeError(f"No window matches '{target}' found.")
+    selected = matches[0]
+    print(f"\nSelected window: '{selected}'")
+
+    return next(w for w in windows if w.title == selected)
 
 def get_game_capture(window):
-    """Generator yielding game frames"""
+    """Generator yielding BGR frames of that window."""
     with mss.mss() as sct:
-        monitor = {
-            "top": window.top,
-            "left": window.left,
-            "width": window.width,
+        mon = {
+            "top":    window.top,
+            "left":   window.left,
+            "width":  window.width,
             "height": window.height,
-            "mon": 0
+            "mon":    0
         }
-        
         while True:
-            frame = np.array(sct.grab(monitor))
-            yield cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
-
-if __name__ == "__main__":
-    # Test capture directly
-    win = find_game_window()
-    cv2.namedWindow("Capture Test", cv2.WINDOW_NORMAL)
-    
-    try:
-        for frame in get_game_capture(win):
-            cv2.imshow("Capture Test", frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-    finally:
-        cv2.destroyAllWindows()
+            img = np.array(sct.grab(mon))
+            yield cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
