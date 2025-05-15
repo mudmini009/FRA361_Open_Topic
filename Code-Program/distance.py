@@ -23,6 +23,3 @@ def calculate_distance_and_angle(box, frame_w: int, frame_h: int):
     if ang < 0:
         ang += 360
     return dist, ang, (ox, oy)
-python
-Copy
-Edit

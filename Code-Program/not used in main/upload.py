@@ -10,7 +10,7 @@ sys.path.append(str(Path('C:/Users/mudno/yolov5').resolve()))
 # Replace with your actual Roboflow API key and project ID
 api_key = "mHg9O9jSYIMK0Jt3O4F5"
 project_id = "fra361_opentopic_aimbot"
-version_id = 1  # The specific version ID you want to deploy
+version_id = 2  # The specific version ID you want to deploy
 
 # Set up Roboflow API connection
 rf = roboflow.Roboflow(api_key=api_key)
@@ -20,7 +20,7 @@ project = rf.workspace().project(project_id)
 version = project.version(version_id)
 
 # Specify the model path for best.pt
-model_path = "C:/Users/mudno/yolov5/runs/train/exp3"  # Full path to the model weights
+model_path = "model\model5(y5x)"  # Full path to the model weights
 
 # Deploy the YOLOv5 model (with your custom weights)
 version.deploy("yolov5", model_path)  # Deploying with weights passed directly
