@@ -1,5 +1,4 @@
-#part of main code (but not main)
-#to detect the screen using yolo model
+#YOLO load/detect code
 # detect.py
 import yolov5
 

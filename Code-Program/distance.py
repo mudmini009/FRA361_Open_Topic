@@ -1,3 +1,5 @@
+#calculate distance
+#distance.py
 import math
 
 def get_center(w: int, h: int):

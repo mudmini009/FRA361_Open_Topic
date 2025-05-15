@@ -1,4 +1,3 @@
-#part of main code (but not main)
 #to pull the screen out 
 # capture.py
 import pygetwindow as gw
