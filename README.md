@@ -9,6 +9,8 @@ Tested primarily in **Kovaak's Aim Trainer** to evaluate latency, tracking accur
 
 ## 📺 Project Showcase
 
+(final_show_robot.gif)
+
 <div align="center">
   <video src="https://github.com/mudmini009/FRA361_Open_Topic/raw/main/final_show_robot.gif" width="100%" controls autoplay loop muted>
   </video>
