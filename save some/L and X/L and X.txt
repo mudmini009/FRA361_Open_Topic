@@ -1,0 +1,15 @@
+L
+
+python ~/Pollapaat6546_WS/YoloOpen/yolov5/train.py --img 640 --batch 16 --epochs 200 \
+  --data ~/Pollapaat6546_WS/YoloOpen/FRA361_OpenTopic_Aimbot.v2i.yolov5pytorch/data.yaml \
+  --cfg models/yolov5l.yaml --weights yolov5l.pt \
+  --device 0 --optimizer Adam --sync-bn --rect --workers 4 --patience 50 \
+  --name yolov5l_v2
+
+X
+
+python ~/Pollapaat6546_WS/YoloOpen/yolov5/train.py --img 640 --batch 12 --epochs 200 \
+  --data ~/Pollapaat6546_WS/YoloOpen/FRA361_OpenTopic_Aimbot.v2i.yolov5pytorch/data.yaml \
+  --cfg models/yolov5x.yaml --weights yolov5x.pt \
+  --device 1 --optimizer Adam --sync-bn --rect --workers 4 --patience 50 \
+  --name yolov5x_v2

@@ -1,0 +1,7 @@
+# ⓵ Medium model – GPU 0
+python train.py --img 640 --batch 24 --epochs 200 --data ~/Pollapaat6546_WS/YoloOpen/FRA361_OpenTopic_Aimbot.v2i.yolov5pytorch/data.yaml --cfg models/yolov5m.yaml --weights yolov5m.pt --device 0 --optimizer Adam --sync-bn --rect --workers 4 --name yolov5m
+# ⓶ Small model fine-tune – GPU 1
+python train.py --img 640 --batch 32 --epochs 150 --data ~/Pollapaat6546_WS/YoloOpen/FRA361_OpenTopic_Aimbot.v2i.yolov5pytorch/data.yaml --cfg models/yolov5s.yaml --weights ~/Pollapaat6546_WS/YoloOpen/weights/best.pt --device 1 --optimizer Adam --sync-bn --rect --workers 4 --name yolov5s_finetune
+
+window to Linux problem so i retrain newly v5s
+python train.py --img 640 --batch 32 --epochs 150 --data ~/Pollapaat6546_WS/YoloOpen/FRA361_OpenTopic_Aimbot.v2i.yolov5pytorch/data.yaml --cfg models/yolov5s.yaml --weights yolov5s.pt --device 1 --optimizer Adam --sync-bn --rect --workers 4 --name yolov5s_v2
