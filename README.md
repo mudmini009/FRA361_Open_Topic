@@ -9,7 +9,8 @@ Tested primarily in **Kovaak's Aim Trainer** to evaluate latency, tracking accur
 
 ## 📺 Project Showcase
 
-(https://github.com/mudmini009/FRA361_Open_Topic/raw/main/final_show_robot.gif).
+![Physical Aimbot Showcase](https://github.com/mudmini009/FRA361_Open_Topic/raw/main/final_show_robot.gif)
+
 ---
 
 ## 🚀 System Architecture
