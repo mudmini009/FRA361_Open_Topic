@@ -17,10 +17,5 @@ venv/
 # PlatformIO ignores
 .pio/
 
-# Logs
-*.log
-aimbot_log.csv
-aimbot_log2.csv
-
 # Other
 .DS_Store
