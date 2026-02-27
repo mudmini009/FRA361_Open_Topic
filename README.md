@@ -9,7 +9,7 @@ Tested primarily in **Kovaak's Aim Trainer** to evaluate latency, tracking accur
 
 ## 📺 Project Showcase
 
-*(Click to play)* <video src="[https://github.com/mudmini009/FRA361_Open_Topic/raw/main/final%20show%20robot.mp4](https://www.google.com/search?q=https://github.com/mudmini009/FRA361_Open_Topic/blob/main/final%20show%20robot.mp4)" controls="controls" style="max-width: 100%;"></video>
+https://github.com/mudmini009/FRA361_Open_Topic/raw/main/final%20show%20robot.mp4
 
 ---
 
