@@ -10,7 +10,7 @@ Tested primarily in **Kovaak's Aim Trainer** to evaluate latency, tracking accur
 ## 📺 Project Showcase
 
 <div align="center">
-  <video src="https://github.com/mudmini009/FRA361_Open_Topic/raw/main/final_show_robot.mp4" width="100%" controls autoplay loop muted>
+  <video src="https://github.com/mudmini009/FRA361_Open_Topic/raw/main/final_show_robot.gif" width="100%" controls autoplay loop muted>
   </video>
   <p><em>Real-time target tracking using YOLOv5m and custom Mecanum-wheeled hardware.</em></p>
 </div>
