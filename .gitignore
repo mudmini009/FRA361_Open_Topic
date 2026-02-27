@@ -2,10 +2,10 @@
 DATASET/
 
 # Ignore large files (>100MB)
-model/model5(y5x)/yolov5x_best.pt
+models/model5(y5x)/yolov5x_best.pt
 
 # Python ignores
-__pycache__/
+**/__pycache__/
 *.py[cod]
 *$py.class
 venv/
