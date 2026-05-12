@@ -1,28 +1,36 @@
-# plotter.py
+# plotter.py — Post-session matplotlib plots
+from typing import List, Tuple
+
 import matplotlib.pyplot as plt
 
-def plot_log(entries):
+
+def plot_log(entries: List[Tuple[float, float, int]]) -> None:
     """
-    entries: list of (dx, dy, mode)
-    Produces a 3‐row plot: mode, dx, dy vs frame index.
+    Show a 3-row chart (mode / dx / dy) vs. frame index.
+
+    Called automatically when the aimbot exits.
     """
-    xs   = list(range(len(entries)))
-    dxs  = [e[0] for e in entries]
-    dys  = [e[1] for e in entries]
-    modes= [e[2] for e in entries]
+    if not entries:
+        print("No data to plot.")
+        return
 
-    fig, axs = plt.subplots(3, 1, sharex=True, figsize=(8, 6))
+    frames = range(len(entries))
+    dxs    = [e[0] for e in entries]
+    dys    = [e[1] for e in entries]
+    modes  = [e[2] for e in entries]
 
-    axs[0].plot(xs, modes,   marker="o", linestyle="-")
-    axs[0].set_ylabel("mode")
-    axs[0].set_title("Aimbot Data Log")
+    fig, axes = plt.subplots(3, 1, sharex=True, figsize=(10, 6))
 
-    axs[1].plot(xs, dxs,     marker=".", linestyle="-")
-    axs[1].set_ylabel("dx (px)")
+    axes[0].plot(frames, modes, marker="o", markersize=2, linestyle="-")
+    axes[0].set_ylabel("Mode")
+    axes[0].set_title("Aimbot Session Log")
 
-    axs[2].plot(xs, dys,     marker=".", linestyle="-")
-    axs[2].set_ylabel("dy (px)")
-    axs[2].set_xlabel("frame #")
+    axes[1].plot(frames, dxs, marker=".", markersize=1, linestyle="-")
+    axes[1].set_ylabel("dx (px)")
+
+    axes[2].plot(frames, dys, marker=".", markersize=1, linestyle="-")
+    axes[2].set_ylabel("dy (px)")
+    axes[2].set_xlabel("Frame #")
 
     plt.tight_layout()
     plt.show()

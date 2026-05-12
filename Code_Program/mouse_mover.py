@@ -1,41 +1,48 @@
-# mouse_mover.py - Virtual mouse movement with DPI / sensitivity scaling
-#                  Windows only (win32api).
+# mouse_mover.py — Pixel-error → raw mouse counts (win32api, Windows only)
 import math
+from typing import Tuple
+
 import win32api
 import win32con
 
-from config import COUNTS_PER_360, AIM_SPEED, PIXEL_DEADZONE, GAME_FOV
+from config import AIM_SPEED, COUNTS_PER_360, GAME_FOV, PIXEL_DEADZONE
 
 
-def move_mouse_relative(dx, dy):
-    """Move the cursor by (dx, dy) raw mouse counts."""
+def move_mouse_relative(dx: int, dy: int) -> None:
+    """Send a relative mouse movement of (dx, dy) raw counts."""
     win32api.mouse_event(win32con.MOUSEEVENTF_MOVE, int(dx), int(dy), 0, 0)
 
 
-def compute_mouse_delta(pixel_dx, pixel_dy, screen_width, screen_height):
+def compute_mouse_delta(
+    pixel_dx: float,
+    pixel_dy: float,
+    screen_width: int,
+    screen_height: int,
+) -> Tuple[int, int]:
     """
-    Convert a pixel offset (from screen centre to target) into raw mouse
-    counts that produce the equivalent in-game rotation.
+    Convert a pixel offset (screen-centre → target) into raw mouse counts.
 
-    Uses perspective-correct angle calculation:
-        focal_length = screen_width / (2 * tan(HFOV / 2))
+    Uses perspective-correct conversion::
+
+        focal_length = screen_width / (2 · tan(FOV/2))
         angle        = atan2(pixel_offset, focal_length)
-    This avoids overshoot for targets near the screen edges compared to a
+
+    This prevents overshoot for targets near screen edges compared to a
     naive linear mapping.
 
     Parameters
     ----------
     pixel_dx, pixel_dy : float
-        Pixel offset from screen centre to target.  +right / +down.
+        Pixel offset from centre.  +right / +down.
     screen_width, screen_height : int
-        Capture resolution in pixels.
+        Capture resolution.
 
     Returns
     -------
-    (mouse_dx, mouse_dy) : tuple[int, int]
-        Raw counts to feed into win32api.mouse_event.
+    (mouse_dx, mouse_dy) : (int, int)
+        Raw counts for ``win32api.mouse_event``.
     """
-    # Dead-zone filter
+    # ── Dead-zone filter ──
     if abs(pixel_dx) < PIXEL_DEADZONE:
         pixel_dx = 0
     if abs(pixel_dy) < PIXEL_DEADZONE:
@@ -44,18 +51,13 @@ def compute_mouse_delta(pixel_dx, pixel_dy, screen_width, screen_height):
     if pixel_dx == 0 and pixel_dy == 0:
         return 0, 0
 
-    # Perspective-correct: pixel offset -> angle in degrees
-    focal_len = screen_width / (2.0 * math.tan(math.radians(GAME_FOV / 2.0)))
+    # ── Perspective-correct: pixels → angle (degrees) ──
+    focal = screen_width / (2.0 * math.tan(math.radians(GAME_FOV / 2.0)))
+    angle_x = math.degrees(math.atan2(pixel_dx, focal))
+    angle_y = math.degrees(math.atan2(pixel_dy, focal))
 
-    angle_x_deg = math.degrees(math.atan2(pixel_dx, focal_len))
-    angle_y_deg = math.degrees(math.atan2(pixel_dy, focal_len))
-
-    # Angle -> raw mouse counts
-    mouse_dx = angle_x_deg / 360.0 * COUNTS_PER_360
-    mouse_dy = angle_y_deg / 360.0 * COUNTS_PER_360
-
-    # Smoothing (lerp factor)
-    mouse_dx *= AIM_SPEED
-    mouse_dy *= AIM_SPEED
+    # ── Angle → raw mouse counts ──
+    mouse_dx = angle_x / 360.0 * COUNTS_PER_360 * AIM_SPEED
+    mouse_dy = angle_y / 360.0 * COUNTS_PER_360 * AIM_SPEED
 
     return int(round(mouse_dx)), int(round(mouse_dy))

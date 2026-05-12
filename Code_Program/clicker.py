@@ -1,46 +1,49 @@
-# clicker.py - Mouse click handling (Windows only, win32api)
+# clicker.py — Pulse-click handling (win32api, Windows only)
 import time
+
 import win32api
 import win32con
 
-click_held = False
-last_click_time = 0
-click_toggle = False
+# ─── Timing constants ─────────────────────────────────────
+_CLICK_HOLD_MS  = 0.070   # how long the button stays pressed (s)
+_CLICK_COOLDOWN = 0.142   # minimum gap between clicks    (s)
+
+# ─── Internal state ───────────────────────────────────────
+_click_held     = False
+_last_click_at  = 0.0
+_click_armed    = False
 
 
-def _press():
-    """Send left mouse button down."""
+def _press() -> None:
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
 
 
-def _release():
-    """Send left mouse button up."""
+def _release() -> None:
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)
 
 
-def handle_mouse_click(mode, on_target):
+def handle_mouse_click(mode: int, on_target: bool) -> None:
     """
-    Mode 0 / 1 : no clicking.
-    Mode 2     : pulse-click (~70 ms press, ~72 ms gap) while on-target.
+    Mode 0 / 1 → no clicking.
+    Mode 2     → pulse-click while crosshair overlaps target bbox.
     """
-    global click_held, last_click_time, click_toggle
+    global _click_held, _last_click_at, _click_armed
 
     # Only mode 2 fires
     if mode != 2:
-        if click_held:
+        if _click_held:
             _release()
-            click_held = False
-        click_toggle = False
+            _click_held = False
+        _click_armed = False
         return
 
-    # Mode 2: pulse click when on target
     now = time.time()
     if on_target:
-        if not click_toggle or (now - last_click_time > 0.142):
+        if not _click_armed or (now - _last_click_at > _CLICK_COOLDOWN):
             _press()
-            time.sleep(0.07)
+            time.sleep(_CLICK_HOLD_MS)
             _release()
-            last_click_time = time.time()
-            click_toggle = True
+            _last_click_at = time.time()
+            _click_armed = True
     else:
-        click_toggle = False
+        _click_armed = False

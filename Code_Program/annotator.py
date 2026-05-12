@@ -1,38 +1,97 @@
-# annotator.py - Draw aim overlay + OSD with hotkey reference
-import cv2
+# annotator.py — Aim overlay + on-screen display (OSD)
 import math
+from typing import Tuple
+
+import cv2
+
+from config  import CENTER_BOX_SIZE, CHEST_Y_FACTOR
+from control import MODE_NAMES, is_paused
 from distance import get_center
-from config   import CENTER_BOX_SIZE, CHEST_Y_FACTOR
-from control  import MODE_NAMES, is_paused
 
 
-def annotate_and_collect(frame, boxes, mode, logger):
+# ─── Colours (BGR) ────────────────────────────────────────
+_GREEN  = (0, 255, 0)
+_RED    = (0, 0, 255)
+_BLUE   = (255, 0, 0)
+_ORANGE = (0, 100, 255)
+_WHITE  = (255, 255, 255)
+_GREY   = (200, 200, 200)
+
+
+# ─── OSD helpers ──────────────────────────────────────────
+
+def _draw_osd(frame, h: int, mode: int, dx: float, dy: float, on_target: int) -> None:
+    """Render mode label, pixel-error readout, and hotkey panel."""
+    paused    = is_paused()
+    mode_name = MODE_NAMES.get(mode, f"Unknown({mode})")
+
+    # ── Top-left: mode + pause badge ──
+    if paused:
+        label = f"MODE: {mode_name}  [PAUSED]"
+        color = _RED
+    else:
+        label = f"MODE: {mode_name}"
+        color = _GREEN if mode > 0 else _ORANGE
+
+    cv2.putText(frame, label, (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
+
+    # ── Second line: pixel error ──
+    info = f"dx: {dx:.1f}px  dy: {dy:.1f}px  OnTarget: {on_target}"
+    cv2.putText(frame, info, (10, 60),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, _WHITE, 1)
+
+    # ── Bottom: hotkey reference ──
+    keys = [
+        "[X] Idle   [C] Track   [V] Flick+Click",
+        "[F9] Pause/Resume   [Z] Quit",
+    ]
+    y = h - 50
+    for line in keys:
+        cv2.putText(frame, line, (10, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.55, _GREY, 1)
+        y += 25
+
+
+# ─── Target selection ─────────────────────────────────────
+
+def _pick_closest_box(boxes, cx: int, cy: int):
+    """Return the bounding-box row whose centre is closest to (cx, cy)."""
+    return min(
+        boxes,
+        key=lambda b: math.hypot((b[0] + b[2]) / 2 - cx,
+                                 (b[1] + b[3]) / 2 - cy),
+    )
+
+
+# ─── Main entry point ────────────────────────────────────
+
+def annotate_and_collect(frame, boxes, mode: int, logger) -> Tuple[Tuple[float, float, int], any]:
     """
-    Draw aim-box, target marker/line, compute (dx, dy, on_target),
-    log them, render the OSD, and return ((dx, dy, on_target), frame).
+    Draw aim-box, marker, line, OSD.  Compute pixel error and log it.
+
+    Returns
+    -------
+    ((dx, dy, on_target), annotated_frame)
     """
     frame = frame.copy()
-    h, w = frame.shape[:2]
+    h, w  = frame.shape[:2]
     cx, cy = get_center(w, h)
-    half = CENTER_BOX_SIZE // 2
-    left, top     = cx - half, cy - half
-    right, bottom = cx + half, cy + half
+    half   = CENTER_BOX_SIZE // 2
+
+    aim_tl = (cx - half, cy - half)
+    aim_br = (cx + half, cy + half)
 
     # Central aim box
-    cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
+    cv2.rectangle(frame, aim_tl, aim_br, _GREEN, 2)
 
     dx, dy, on_target = 0.0, 0.0, 0
 
     if boxes.size:
-        # Pick the bounding box closest to screen centre
-        best = min(
-            ((math.hypot((b[0]+b[2])/2 - cx, (b[1]+b[3])/2 - cy), b)
-             for b in boxes),
-            key=lambda x: x[0]
-        )[1]
+        best = _pick_closest_box(boxes, cx, cy)
         x1, y1, x2, y2 = best[:4]
 
-        # Chest point (aim slightly below head)
+        # Aim point: chest height (fraction of bbox from top)
         tx = (x1 + x2) / 2
         ty = y1 + (y2 - y1) * CHEST_Y_FACTOR
 
@@ -40,44 +99,16 @@ def annotate_and_collect(frame, boxes, mode, logger):
         dx = tx - cx
         dy = cy - ty
 
-        # On-target if bounding box overlaps the aim box
-        if not (x2 < left or x1 > right or y2 < top or y1 > bottom):
+        # On-target: bbox overlaps the aim box
+        if not (x2 < aim_tl[0] or x1 > aim_br[0] or
+                y2 < aim_tl[1] or y1 > aim_br[1]):
             on_target = 1
 
-        # Draw marker + line
-        cv2.circle(frame, (int(tx), int(ty)), 5, (0, 0, 255), -1)
-        cv2.line(frame, (cx, cy), (int(tx), int(ty)), (255, 0, 0), 2)
+        # Marker + line
+        cv2.circle(frame, (int(tx), int(ty)), 5, _RED, -1)
+        cv2.line(frame, (cx, cy), (int(tx), int(ty)), _BLUE, 2)
 
-    # Log dx, dy, mode
     logger.log(round(dx, 1), round(dy, 1), mode)
-
-    # --- OSD: Mode + Status ---
-    mode_name = MODE_NAMES.get(mode, "Unknown({})".format(mode))
-    paused    = is_paused()
-
-    # Mode label - green when active, red when idle/paused
-    if paused:
-        mode_color = (0, 0, 255)
-        mode_text  = "MODE: {}  [PAUSED]".format(mode_name)
-    else:
-        mode_color = (0, 255, 0) if mode > 0 else (0, 100, 255)
-        mode_text  = "MODE: {}".format(mode_name)
-
-    cv2.putText(frame, mode_text, (10, 30),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.8, mode_color, 2)
-
-    # Pixel error readout
-    cv2.putText(frame, "dx: {:.1f}px  dy: {:.1f}px  OnTarget: {}".format(dx, dy, on_target),
-                (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
-
-    # --- Hotkey reference panel (bottom of frame) ---
-    hotkey_lines = [
-        "[F1] Idle   [F2] Track   [F3] Flick+Click",
-        "[F9] Pause/Resume   [F10] Quit",
-    ]
-    y_start = h - 50
-    for i, line in enumerate(hotkey_lines):
-        cv2.putText(frame, line, (10, y_start + i * 25),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.55, (200, 200, 200), 1)
+    _draw_osd(frame, h, mode, dx, dy, on_target)
 
     return (dx, dy, on_target), frame

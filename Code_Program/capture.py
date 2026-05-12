@@ -1,41 +1,43 @@
-#to pull the screen out 
-# capture.py
-import pygetwindow as gw
-import mss
-import numpy as np
-import cv2
+# capture.py — Window selection + MSS screen capture
 import difflib
 
+import cv2
+import mss
+import numpy as np
+import pygetwindow as gw
+
+
 def select_game_window():
-    """List visible windows and prompt user to type part of the title."""
-    windows = [w for w in gw.getAllWindows() if w.visible]
+    """List visible windows and let the user pick one by partial title."""
+    windows = [w for w in gw.getAllWindows() if w.visible and w.title.strip()]
     if not windows:
         raise RuntimeError("No visible windows found!")
 
     titles = [w.title for w in windows]
     print("Available windows:")
-    for t in titles:
-        print(f" - {t}")
+    for title in titles:
+        print(f"  • {title}")
 
-    target = input("\nType part of the window title to select: ")
-    matches = difflib.get_close_matches(target, titles, n=1, cutoff=0)
+    query   = input("\nType part of the window title to select: ")
+    matches = difflib.get_close_matches(query, titles, n=1, cutoff=0)
     if not matches:
-        raise RuntimeError(f"No window matches '{target}' found.")
-    selected = matches[0]
-    print(f"\nSelected window: '{selected}'")
+        raise RuntimeError(f"No window matching '{query}'.")
 
+    selected = matches[0]
+    print(f"\n→ Selected: '{selected}'\n")
     return next(w for w in windows if w.title == selected)
 
+
 def get_game_capture(window):
-    """Generator yielding BGR frames of that window."""
+    """Generator that yields BGR frames of the selected window region."""
     with mss.mss() as sct:
-        mon = {
+        region = {
             "top":    window.top,
             "left":   window.left,
             "width":  window.width,
             "height": window.height,
-            "mon":    0
+            "mon":    0,
         }
         while True:
-            img = np.array(sct.grab(mon))
-            yield cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
+            raw = np.array(sct.grab(region))
+            yield cv2.cvtColor(raw, cv2.COLOR_BGRA2BGR)

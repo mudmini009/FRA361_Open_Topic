@@ -1,13 +1,14 @@
-# control.py - Keyboard-based mode / quit / pause logic
+# control.py — Keyboard-based mode / quit / pause logic
 import keyboard
 
-QUIT_KEY  = 'f10'
+# ─── Key Bindings ──────────────────────────────────
+QUIT_KEY  = 'z'
 PAUSE_KEY = 'f9'
 
 MODE_KEYS = {
-    'f1': 0,   # Idle - no aim, no click
-    'f2': 1,   # Track - aim follows target, no click
-    'f3': 2,   # Flick + Click - aim snaps and fires pulse clicks
+    'x': 0,   # Idle   — no aim, no click
+    'c': 1,   # Track  — aim follows target, no click
+    'v': 2,   # Flick + Click — aim snaps and fires
 }
 
 MODE_NAMES = {
@@ -16,6 +17,7 @@ MODE_NAMES = {
     2: "FLICK + CLICK (Aim & Fire)",
 }
 
+# ─── Internal State ───────────────────────────────
 _paused = False
 
 
@@ -37,7 +39,7 @@ def is_paused():
 
 def get_mode(current_mode):
     """Check for mode-switch key presses; return new or current mode."""
-    for key, m in MODE_KEYS.items():
+    for key, mode in MODE_KEYS.items():
         if keyboard.is_pressed(key):
-            return m
+            return mode
     return current_mode
