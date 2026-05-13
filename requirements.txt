@@ -1,6 +1,6 @@
 # --- Vision & Inference ---
-torch>=2.1
-torchvision>=0.16
+torch>=2.1,<2.6
+torchvision>=0.16,<0.21
 yolov5>=7.0
 opencv-python>=4.8
 
