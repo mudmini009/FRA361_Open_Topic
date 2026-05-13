@@ -120,13 +120,25 @@ CONFIDENCE     = 0.23      # YOLO detection threshold
 
 ## 🧠 AI Models
 
-Custom-trained YOLOv5 weights in `models/`:
+Custom-trained YOLO8 weights in `models/`. You pick the model at startup:
 
-| Model | File | Speed | Use case |
-|-------|------|-------|----------|
-| YOLOv5s | `model1(y5s)/` | ~15ms | Fast tracking |
-| **YOLOv5m** | `model3(y5m)/` | ~25ms | **Recommended** — best accuracy/speed balance |
-| YOLOv5l | `model4(y5l)/` | ~40ms | High precision, slower |
+```
+=======================================================
+       SELECT YOLO8 MODEL
+=======================================================
+  [1]  YOLO8-S     ~15ms  (fast)
+  [2]  YOLO8-S v2  ~15ms  (fast, alt)
+  [3]  YOLO8-M     ~25ms  (recommended) ★
+  [4]  YOLO8-L     ~40ms  (accurate)
+=======================================================
+Pick model [1-4] (Enter = M):
+```
+
+| Model | Speed | Use case |
+|-------|-------|----------|
+| YOLO8-S | ~15ms | Fast tracking, lower accuracy |
+| **YOLO8-M** | ~25ms | **Recommended** — best balance |
+| YOLO8-L | ~40ms | High precision, slower |
 
 ---
 

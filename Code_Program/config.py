@@ -3,39 +3,34 @@ import os
 import sys
 
 
-# ─── Model Selection ──────────────────────────────────────
-# Change this to use a different YOLO model:
-#   "model1(y5s)"  → YOLOv5s  ~15ms  (fast, less accurate)
-#   "model2(y5s)"  → YOLOv5s  ~15ms  (alternate training)
-#   "model3(y5m)"  → YOLOv5m  ~25ms  (recommended)
-#   "model4(y5l)"  → YOLOv5l  ~40ms  (slow, most accurate)
-MODEL_CHOICE = "model3(y5m)"
-
-# Weight filenames per model folder
-_WEIGHT_NAMES = {
-    "model1(y5s)": "yolov5s_best.pt",
-    "model2(y5s)": "yolov5s_best.pt",
-    "model3(y5m)": "yolov5m_best.pt",
-    "model4(y5l)": "yolov5l_best.pt",
+# ─── Available Models ─────────────────────────────────────
+# Maps display name → (folder, weight filename)
+MODELS = {
+    "S":    ("model1(y5s)", "yolov5s_best.pt"),
+    "S v2": ("model2(y5s)", "yolov5s_best.pt"),
+    "M":    ("model3(y5m)", "yolov5m_best.pt"),
+    "L":    ("model4(y5l)", "yolov5l_best.pt"),
 }
 
+DEFAULT_MODEL = "M"
 
-def _get_model_path() -> str:
+
+def get_model_path(choice: str) -> str:
     """
-    Resolve YOLO weight file path.
+    Resolve YOLO weight path for the chosen model.
     - PyInstaller bundle  → sys._MEIPASS root
-    - Development         → ../models/<MODEL_CHOICE>/
+    - Development         → ../models/<folder>/
     """
-    weight = _WEIGHT_NAMES.get(MODEL_CHOICE, "yolov5m_best.pt")
+    folder, weight = MODELS[choice]
     if getattr(sys, "_MEIPASS", None):
         return os.path.join(sys._MEIPASS, weight)
     return os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
-        "..", "models", MODEL_CHOICE, weight,
+        "..", "models", folder, weight,
     )
 
 
-MODEL_PATH  = _get_model_path()
+# ─── Inference ────────────────────────────────────────────
 CONFIDENCE  = 0.23
 IMGSZ       = 640
 

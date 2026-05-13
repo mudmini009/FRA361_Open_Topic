@@ -4,7 +4,9 @@ import keyboard
 
 from capture      import select_game_window, get_game_capture
 from clicker      import handle_mouse_click
-from config       import CONFIDENCE, IMGSZ, MODEL_PATH
+from config       import (
+    CONFIDENCE, IMGSZ, MODELS, DEFAULT_MODEL, get_model_path,
+)
 from control      import (
     PAUSE_KEY, get_mode, is_paused, should_quit, toggle_pause,
 )
@@ -15,7 +17,7 @@ from mouse_mover  import compute_mouse_delta, move_mouse_relative
 from plotter      import plot_log
 
 
-# ─── Startup banner ──────────────────────────────────────
+# ─── Startup UI ──────────────────────────────────────────
 
 def _print_banner() -> None:
     """Print hotkey cheat-sheet to the console."""
@@ -29,6 +31,36 @@ def _print_banner() -> None:
     print("  [Z]   QUIT and save logs")
     print("=" * 55)
     print()
+
+
+def _select_model() -> str:
+    """Interactive model selection at startup."""
+    print("=" * 55)
+    print("       SELECT YOLO8 MODEL")
+    print("=" * 55)
+
+    options = list(MODELS.keys())
+    speeds  = {"S": "~15ms  (fast)", "S v2": "~15ms  (fast, alt)", "M": "~25ms  (recommended)", "L": "~40ms  (accurate)"}
+
+    for i, name in enumerate(options, 1):
+        tag   = " ★" if name == DEFAULT_MODEL else ""
+        speed = speeds.get(name, "")
+        print(f"  [{i}]  YOLO8-{name:<4s}  {speed}{tag}")
+
+    print("=" * 55)
+
+    while True:
+        raw = input(f"Pick model [1-{len(options)}] (Enter = {DEFAULT_MODEL}): ").strip()
+        if raw == "":
+            choice = DEFAULT_MODEL
+            break
+        if raw.isdigit() and 1 <= int(raw) <= len(options):
+            choice = options[int(raw) - 1]
+            break
+        print("  Invalid choice, try again.")
+
+    print(f"\n→ Loading YOLO8-{choice}...\n")
+    return choice
 
 
 # ─── Pause edge-detection ────────────────────────────────
@@ -52,11 +84,12 @@ class _PauseToggle:
 
 def main() -> None:
     _print_banner()
+    model_choice = _select_model()
+    model_path   = get_model_path(model_choice)
 
-    # Initialise
     window   = select_game_window()
     capture  = get_game_capture(window)
-    model    = load_model(MODEL_PATH, CONFIDENCE)
+    model    = load_model(model_path, CONFIDENCE)
     logger   = DataLogger()
     pause    = _PauseToggle()
     mode     = 0
