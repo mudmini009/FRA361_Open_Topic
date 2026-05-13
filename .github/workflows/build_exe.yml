@@ -37,6 +37,7 @@ jobs:
             --hidden-import=win32con \
             --hidden-import=keyboard \
             --hidden-import=pywintypes \
+            --hidden-import=pkg_resources \
             main.py
 
       - name: Upload EXE as artifact
