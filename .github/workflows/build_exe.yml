@@ -33,11 +33,14 @@ jobs:
             --add-data "../models/model3(y5m)/yolov5m_best.pt;." \
             --collect-all yolov5 \
             --collect-all torch \
+            --collect-all setuptools \
+            --collect-all pkg_resources \
             --hidden-import=win32api \
             --hidden-import=win32con \
             --hidden-import=keyboard \
             --hidden-import=pywintypes \
             --hidden-import=pkg_resources \
+            --hidden-import=setuptools \
             main.py
 
       - name: Upload EXE as artifact
