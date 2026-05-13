@@ -13,8 +13,8 @@ MODE_KEYS = {
 
 MODE_NAMES = {
     0: "IDLE (Paused)",
-    1: "TRACK (Aim Only)",
-    2: "FLICK + CLICK (Aim & Fire)",
+    1: "TRACK (Hold Click)",
+    2: "FLICK + CLICK (Pulse Fire)",
 }
 
 # ─── Internal State ───────────────────────────────

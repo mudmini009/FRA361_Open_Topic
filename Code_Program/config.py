@@ -3,18 +3,35 @@ import os
 import sys
 
 
-# ─── Model Settings ───────────────────────────────────────
+# ─── Model Selection ──────────────────────────────────────
+# Change this to use a different YOLO model:
+#   "model1(y5s)"  → YOLOv5s  ~15ms  (fast, less accurate)
+#   "model2(y5s)"  → YOLOv5s  ~15ms  (alternate training)
+#   "model3(y5m)"  → YOLOv5m  ~25ms  (recommended)
+#   "model4(y5l)"  → YOLOv5l  ~40ms  (slow, most accurate)
+MODEL_CHOICE = "model3(y5m)"
+
+# Weight filenames per model folder
+_WEIGHT_NAMES = {
+    "model1(y5s)": "yolov5s_best.pt",
+    "model2(y5s)": "yolov5s_best.pt",
+    "model3(y5m)": "yolov5m_best.pt",
+    "model4(y5l)": "yolov5l_best.pt",
+}
+
+
 def _get_model_path() -> str:
     """
     Resolve YOLO weight file path.
     - PyInstaller bundle  → sys._MEIPASS root
-    - Development         → ../models/model3(y5m)/
+    - Development         → ../models/<MODEL_CHOICE>/
     """
+    weight = _WEIGHT_NAMES.get(MODEL_CHOICE, "yolov5m_best.pt")
     if getattr(sys, "_MEIPASS", None):
-        return os.path.join(sys._MEIPASS, "yolov5m_best.pt")
+        return os.path.join(sys._MEIPASS, weight)
     return os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
-        "..", "models", "model3(y5m)", "yolov5m_best.pt",
+        "..", "models", MODEL_CHOICE, weight,
     )
 
 

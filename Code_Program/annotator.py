@@ -43,7 +43,7 @@ def _draw_osd(frame, h: int, mode: int, dx: float, dy: float, on_target: int) ->
 
     # ── Bottom: hotkey reference ──
     keys = [
-        "[X] Idle   [C] Track   [V] Flick+Click",
+        "[X] Idle   [C] Track+Hold   [V] Flick+Pulse",
         "[F9] Pause/Resume   [Z] Quit",
     ]
     y = h - 50

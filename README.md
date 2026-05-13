@@ -26,8 +26,8 @@ Tested in **KovaaK's Aim Trainer** (103° FOV, 800 DPI, 33 cm/360°).
 | Key | Action |
 |-----|--------|
 | `X` | Mode 0 — **IDLE** (no aim, no click) |
-| `C` | Mode 1 — **TRACK** (aim follows target, no click) |
-| `V` | Mode 2 — **FLICK + CLICK** (aim & auto-fire) |
+| `C` | Mode 1 — **TRACK** (aim + hold click while on target) |
+| `V` | Mode 2 — **FLICK + CLICK** (aim + pulse fire) |
 | `F9` | **Pause / Resume** |
 | `Z` | **Quit** and save logs |
 
@@ -44,7 +44,7 @@ Tested in **KovaaK's Aim Trainer** (103° FOV, 800 DPI, 33 cm/360°).
  ┃  ┣ detect.py              # YOLOv5 model loading + inference
  ┃  ┣ annotator.py           # Aim overlay + OSD rendering
  ┃  ┣ mouse_mover.py         # Pixel error → raw mouse counts (win32api)
- ┃  ┣ clicker.py             # Pulse-click logic (win32api)
+ ┃  ┣ clicker.py             # Hold-click & pulse-click logic (win32api)
  ┃  ┣ control.py             # Hotkey / mode / pause logic
  ┃  ┣ distance.py            # Geometric helpers
  ┃  ┣ logger.py              # Per-frame CSV logging
@@ -91,10 +91,18 @@ python main.py
 Edit `Code_Program/config.py` to match your setup:
 
 ```python
+# ─── Model Selection ─────────────────────────────
+# Change this line to switch YOLO model:
+MODEL_CHOICE = "model3(y5m)"    # recommended
+#   "model1(y5s)"  → YOLOv5s  ~15ms  (fast, less accurate)
+#   "model3(y5m)"  → YOLOv5m  ~25ms  (recommended)
+#   "model4(y5l)"  → YOLOv5l  ~40ms  (slow, most accurate)
+
+# ─── Sensitivity ─────────────────────────────────
 MOUSE_DPI      = 800       # your mouse DPI
 CM_PER_360     = 33.0      # cm of mousepad for a full 360°
-GAME_FOV       = 103.0     # horizontal FOV (103 = Overwatch/KovaaK default)
-AIM_SPEED      = 1.0       # 1.0 = instant snap, 0.3 = smooth tracking
+GAME_FOV       = 103.0     # horizontal FOV
+AIM_SPEED      = 1.0       # 1.0 = instant snap, 0.3 = smooth
 PIXEL_DEADZONE = 5         # ignore tiny movements (px)
 CONFIDENCE     = 0.23      # YOLO detection threshold
 ```
