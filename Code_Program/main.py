@@ -1,5 +1,4 @@
 # main.py — Virtual Aimbot entry point (Windows only)
-import pkg_resources  # FORCE PYINSTALLER TO BUNDLE THIS
 import cv2
 import keyboard
 
