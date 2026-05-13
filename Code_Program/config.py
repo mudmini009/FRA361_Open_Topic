@@ -3,34 +3,22 @@ import os
 import sys
 
 
-# ─── Available Models ─────────────────────────────────────
-# Maps display name → (folder, weight filename)
-MODELS = {
-    "S":    ("model1(y5s)", "yolov5s_best.pt"),
-    "S v2": ("model2(y5s)", "yolov5s_best.pt"),
-    "M":    ("model3(y5m)", "yolov5m_best.pt"),
-    "L":    ("model4(y5l)", "yolov5l_best.pt"),
-}
-
-DEFAULT_MODEL = "M"
-
-
-def get_model_path(choice: str) -> str:
+# ─── Model ────────────────────────────────────────────────
+def _get_model_path() -> str:
     """
-    Resolve YOLO weight path for the chosen model.
-    - PyInstaller bundle  → sys._MEIPASS root
-    - Development         → ../models/<folder>/
+    Resolve YOLO weight path.
+    - PyInstaller  → sys._MEIPASS root
+    - Development  → ../models/model3(y5m)/
     """
-    folder, weight = MODELS[choice]
     if getattr(sys, "_MEIPASS", None):
-        return os.path.join(sys._MEIPASS, weight)
+        return os.path.join(sys._MEIPASS, "yolov5m_best.pt")
     return os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
-        "..", "models", folder, weight,
+        "..", "models", "model3(y5m)", "yolov5m_best.pt",
     )
 
 
-# ─── Inference ────────────────────────────────────────────
+MODEL_PATH  = _get_model_path()
 CONFIDENCE  = 0.23
 IMGSZ       = 640
 
@@ -44,7 +32,6 @@ CM_PER_360  = 33.0        # in-game sens: 33 cm pad = full 360°
 GAME_FOV    = 103.0       # horizontal FOV (Overwatch / KovaaK default)
 
 # Derived: raw sensor counts for one full 360° rotation
-#   counts = cm × DPI / 2.54
 COUNTS_PER_360 = CM_PER_360 * MOUSE_DPI / 2.54   # ≈ 10 394
 
 # ─── Aim Behaviour ───────────────────────────────────────

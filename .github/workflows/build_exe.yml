@@ -31,6 +31,8 @@ jobs:
           pyinstaller --onefile \
             --name VirtualAimbot \
             --add-data "../models/model3(y5m)/yolov5m_best.pt;." \
+            --collect-all yolov5 \
+            --collect-all torch \
             --hidden-import=win32api \
             --hidden-import=win32con \
             --hidden-import=keyboard \
