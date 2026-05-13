@@ -5,6 +5,12 @@ import yolov5
 
 def load_model(model_path: str, confidence: float):
     """Load a YOLOv5 model and set its confidence threshold."""
+    # -- Monkeypatch PyInstaller crash --
+    # YOLOv5's file_date checks __file__.stat(), which crashes in PyInstaller
+    # because the files are bundled in a zip/pyc and don't have standard stats.
+    import yolov5.utils.general
+    yolov5.utils.general.file_date = lambda path="": "2024-01-01"
+    
     model = yolov5.load(model_path)
     model.conf = confidence
     return model
