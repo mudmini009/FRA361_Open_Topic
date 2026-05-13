@@ -2,8 +2,8 @@ name: Build Windows EXE
 
 on:
   push:
-    branches: [main, master]
-  workflow_dispatch:        # manual trigger button
+    branches: [software-only]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,22 +18,23 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install PyTorch (CPU — smaller build)
+      - name: Install PyTorch (CPU)
         run: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 
       - name: Install dependencies
         run: pip install -r requirements.txt
 
       - name: Build EXE with PyInstaller
+        shell: bash
         working-directory: Code_Program
         run: |
-          pyinstaller --onefile ^
-            --name VirtualAimbot ^
-            --add-data "..\models\model3(y5m)\yolov5m_best.pt;." ^
-            --hidden-import=win32api ^
-            --hidden-import=win32con ^
-            --hidden-import=keyboard ^
-            --hidden-import=pywintypes ^
+          pyinstaller --onefile \
+            --name VirtualAimbot \
+            --add-data "../models/model3(y5m)/yolov5m_best.pt;." \
+            --hidden-import=win32api \
+            --hidden-import=win32con \
+            --hidden-import=keyboard \
+            --hidden-import=pywintypes \
             main.py
 
       - name: Upload EXE as artifact
