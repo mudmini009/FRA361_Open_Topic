@@ -7,9 +7,20 @@ def load_model(model_path: str, confidence: float):
     """Load a YOLOv5 model and set its confidence threshold."""
     # -- Monkeypatch PyInstaller crash --
     # YOLOv5's file_date checks __file__.stat(), which crashes in PyInstaller
-    # because the files are bundled in a zip/pyc and don't have standard stats.
-    import yolov5.utils.general
-    yolov5.utils.general.file_date = lambda path="": "2024-01-01"
+    # because .pyc files inside the zip don't exist as standard files.
+    # By mocking Path.stat, we globally bypass this check.
+    import pathlib
+    original_stat = pathlib.Path.stat
+    
+    def safe_stat(self, *args, **kwargs):
+        try:
+            return original_stat(self, *args, **kwargs)
+        except FileNotFoundError:
+            class DummyStat:
+                st_mtime = 0
+            return DummyStat()
+            
+    pathlib.Path.stat = safe_stat
     
     model = yolov5.load(model_path)
     model.conf = confidence
