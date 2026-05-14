@@ -12,6 +12,9 @@ def load_model(model_path: str, confidence: float):
     import pathlib
     original_stat = pathlib.Path.stat
     
+    # Fix Linux-trained model loading on Windows
+    pathlib.PosixPath = pathlib.WindowsPath
+    
     def safe_stat(self, *args, **kwargs):
         try:
             return original_stat(self, *args, **kwargs)
