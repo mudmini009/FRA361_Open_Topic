@@ -1,7 +1,6 @@
 
 ---
-
-# 🤖 Physical Aimbot for FPS Games using Computer Vision
+# 🤖 MechAim-CV: Hardware-Based Physical Aimbot Using Computer Vision
 
 A hardware-based robotic aimbot that uses real-time object detection (YOLOv5) to physically move a computer mouse. Built as an end-to-end exploration of Computer Vision, PID Control, and Inverse Kinematics.
 
@@ -108,11 +107,10 @@ The `models/` folder contains custom-trained YOLOv5 weights evaluated on a Tesla
 
 ---
 
-## 🎓 Academic Context
+🎓 Engineering & Academic Context
 
-This system was engineered for the **FRA361 - Open Topics** coursework. Detailed breakdowns of the 3D printing iterations, PWM deadzone handling, PID data-logging, and dataset augmentation strategies can be found in `Presentation.pdf` and the `documentation/` folder.
+This system was originally developed and engineered as part of the **FRA361 - Open Topics** coursework within the Institute of Field Robotics (FIBO). Extensive research documentation regarding the physical prototyping iterations, empirical PWM deadzone calibrations, and dataset augmentation metrics can be found inside the `documentation/` folder and the accompanying `Presentation.pdf`.
 
-**Author:** Pollapaat Suttimala
-
+* **Lead Engineer:** Pollapaat Suttimala
 ---
 
